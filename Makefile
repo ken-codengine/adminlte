@@ -95,3 +95,16 @@ ide-helper:
 	docker compose exec app php artisan ide-helper:generate
 	docker compose exec app php artisan ide-helper:meta
 	docker compose exec app php artisan ide-helper:models --nowrite
+
+serve:
+	docker compose exec app php artisan serve
+
+config-cache:
+	docker compose exec app php artisan config:clear
+	docker compose exec app php artisan config:cache
+
+node:
+	docker compose exec node ash
+npm:
+	docker compose exec node npm install
+	docker compose exec node npm run dev
