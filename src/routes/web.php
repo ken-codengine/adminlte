@@ -24,3 +24,20 @@ Route::get('/admin/home', function () {
     return view('admin/home');
 })
     ->name('admin.home');
+
+Route::post(
+    '/admin/auth',
+    '\App\Http\Controllers\Admin\LoginController@authenticate'
+)->name('admin.auth');
+
+Route::middleware(['auth:admin'])->group(function () {
+    // ログイン認証が通ってない場合、URLで直接homeにアクセスしても画面が見れないように
+    Route::get('/admin/home', function () {
+        return view('/admin/home');
+    })->name('admin.home');
+});
+
+Route::post(
+    '/admin/logout',
+    '\App\Http\Controllers\Admin\LoginController@logout'
+)->name('admin.logout');
