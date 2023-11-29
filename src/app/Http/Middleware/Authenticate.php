@@ -14,4 +14,13 @@ class Authenticate extends Middleware
     {
         return $request->expectsJson() ? null : route('login');
     }
+
+    protected function redirectToOriginal($request, array $guards)
+    {
+        foreach ($guards as $guard) {
+            if ($guard === 'admin') {
+                return route('admin.login');
+            }
+        }
+    }
 }

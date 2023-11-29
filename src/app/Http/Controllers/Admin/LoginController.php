@@ -31,6 +31,7 @@ class LoginController extends Controller
             return redirect()->intended('/admin/home');
         }
 
+        // return redirect('/admin/login')->withErrors([
         return back()->withErrors([
             'login_error' => 'メールアドレスかパスワードが間違っています。',
         ]);
