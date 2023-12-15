@@ -7,7 +7,34 @@
 @stop
 
 @section('content')
-    <p>Welcome to this beautiful admin panel.</p>
+    <x-adminlte-card>
+        <div id='calendar'></div>
+    </x-adminlte-card>
+    @push('js')
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var calendarEl = document.getElementById('calendar');
+                let calendar = new FullCalendar.Calendar(calendarEl, {
+                    //表示テーマ
+                    themeSystem: 'bootstrap',
+                    contentHeight: '90vh',
+                    // plugins: [interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin],
+                    initialView: 'dayGridMonth',
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,listWeek'
+                    },
+                    // スマホでタップしたとき即反応
+                    selectLongPressDelay: 0,
+                    // locale: 'ja',
+
+                });
+                calendar.render();
+                console.log('calendar');
+            });
+        </script>
+    @endpush
 @stop
 
 @section('css')

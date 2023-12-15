@@ -490,6 +490,28 @@ return [
                 ],
             ],
         ],
+        'fullcalendar' => [
+            'active' => true,
+            'files' => [
+                [
+                    'type' => 'css',
+                    'asset' => true,
+                    'location' => 'vendor/fullcalendar/main.css',
+                ],
+                [
+                    'type' => 'js',
+                    'asset' => true,
+                    'location' => 'vendor/fullcalendar/main.js',
+                ],
+                //日本語化
+                [
+                    'type' => 'js',
+                    'asset' => true,
+                    'location' => 'vendor/fullcalendar/locales/ja.js',
+                ],
+
+            ],
+        ],
     ],
 
     /*
