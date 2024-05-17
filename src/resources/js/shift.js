@@ -80,21 +80,21 @@ let calendar = new Calendar(calendarEl, {
     };
   },
 
-//   events: function (info, successCallback, failureCallback) {
-//     const startDate = new Date();
-//     const endDate = new Date();
-//     startDate.setFullYear(
-//       info.start.getFullYear(),
-//       info.start.getMonth(),
-//       info.start.getDate()
-//     );
-//     endDate.setFullYear(
-//       info.end.getFullYear(),
-//       info.end.getMonth(),
-//       info.end.getDate()
-//     );
+  events: function (info, successCallback, failureCallback) {
+    const startDate = new Date();
+    const endDate = new Date();
+    startDate.setFullYear(
+      info.start.getFullYear(),
+      info.start.getMonth(),
+      info.start.getDate()
+    );
+    endDate.setFullYear(
+      info.end.getFullYear(),
+      info.end.getMonth(),
+      info.end.getDate()
+    );
 
-//     const holidays = holiday_jp.between(new Date(startDate), new Date(endDate));
+    const holidays = holiday_jp.between(new Date(startDate), new Date(endDate));
     
 //     // Laravelのイベント取得処理の呼び出し
 //     axios
@@ -138,7 +138,7 @@ let calendar = new Calendar(calendarEl, {
 //             // バリデーションエラーなど
 //             alert("取得に失敗しました");
 //         });
-//     },
+    },
     
 //     selectable: true,
 //     select: function (info) {
