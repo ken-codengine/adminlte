@@ -108,3 +108,6 @@ node:
 npm:
 	docker compose exec node npm install
 	docker compose exec node npm run dev
+
+# copy-holiday-jp:
+# 	@cp -R src/node_modules/@holiday-jp/holiday_jp src/public/js/holiday_jp

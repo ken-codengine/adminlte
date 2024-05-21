@@ -132,6 +132,7 @@
     </x-adminlte-card>
     @push('js')
         <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script src="/js/holiday_jp.js"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 // const editModal = new Modal(document.getElementById('editModal'));
@@ -151,10 +152,30 @@
                     selectLongPressDelay: 0,
                     locale: 'ja',
 
-                    //日本語化の日表示を外す
+                    //祝日に赤spanタグを挿入
                     dayCellContent: function(arg) {
-                        arg.dayNumberText = arg.dayNumberText.replace('日', '');
-                        return arg.dayNumberText;
+                        // console.log(arg);
+                        const date = new Date();
+                        date.setFullYear(
+                            arg.date.getFullYear(),
+                            arg.date.getMonth(),
+                            arg.date.getDate()
+                        );
+                        const holiday = holiday_jp.between(new Date(date), new Date(date));
+                        let hol_tag = document.createElement('span')
+                        if (holiday[0]) {
+                            hol_tag.innerHTML = `${arg.date.getDate()}`
+                            hol_tag.className = 'fc-day-hol';
+
+                            let arrayOfDomNodes = [hol_tag]
+                            return {
+                                domNodes: arrayOfDomNodes
+                            }
+                        } else {
+                            //日本語化の日表示を外す
+                            arg.dayNumberText = arg.dayNumberText.replace('日', '');
+                            return arg.dayNumberText;
+                        }
                     },
 
                     events: function(info, successCallback, failureCallback) {
@@ -250,11 +271,11 @@
 @stop
 
 @section('css')
-    {{-- <link rel="stylesheet" href="/css/admin_custom.css"> --}}
+    <link rel="stylesheet" href="/css/admin_custom.css">
 @stop
 
 @section('js')
     <script>
-        console.log('Hi!');
+        // console.log('Hi!');
     </script>
 @stop
