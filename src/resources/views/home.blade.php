@@ -1,37 +1,94 @@
 @extends('layouts.app')
 
 @section('content')
-    <section class="shift">
-        <div id='shift'></div>
-    </section>
-    {{-- <!-- CreateModal -->
-    <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">予定を登録</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form name="create_form">
-                    <div class="modal-body">
-                        <label for="create_date" class="col-label">登録予定日:</label>
-                        <input type="date" class="form-control" id="create_date" name="date" value="">
-                        @foreach ($session_times as $key => $val)
-                            <div class="col-md-2 py-1 ml-4 my-auto">
-                                {{ Form::checkbox('session_times', $key, [], ['id' => 'tag' . $key, 'class' => 'form-check-input']) }}
-                                {{ Form::label($val->settion_time, [], ['class' => 'form-check-label']) }}
-                            </div>
-                        @endforeach
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
-                        <button type="button" class="btn btn-primary" id="store-btn" data-bs-dismiss="modal">保存する</button>
-                    </div>
-                </form>
-            </div>
+  <section class="shift">
+    <div id='shift'></div>
+  </section>
+  <!-- CreateModal -->
+  <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">予定を登録</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
+        <form name="create_form">
+          <div class="modal-body">
+            <label for="create_date" class="col-label">登録予定日:</label>
+            <input type="date" class="form-control" id="create_date" name="date" value="">
+            @foreach ($session_times as $key => $times)
+              <div class="col-md-2 py-1 ml-4 my-auto">
+                {{ Form::checkbox('session_times', $key, [], ['id' => 'tag' . $key, 'class' => 'form-check-input']) }}
+                {{ Form::label($times['start_time'] . ' ~ ' . $times['end_time'], [], ['class' => 'form-check-label']) }}
+              </div>
+            @endforeach
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+            <button type="button" class="btn btn-primary" id="store-btn" data-bs-dismiss="modal">保存する</button>
+          </div>
+        </form>
+      </div>
     </div>
-    <!-- EditModal -->
+  </div>
+  <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">予定確認</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+          </button>
+        </div>
+        <div class="modal-body">
+          <h5>登録されている予定</h5>
+          <div id="confirm-text"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+          {{-- <button type="button" class="btn btn-danger" id="delete-btn" data-bs-dismiss="modal">削除する</button> --}}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="cautionModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">予定確認</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+          </button>
+        </div>
+        <div class="modal-body">
+          <h5>提出期間を過ぎているため変更はできません</h5>
+          <div id="caution-text"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+          {{-- <button type="button" class="btn btn-danger" id="delete-btn" data-bs-dismiss="modal">削除する</button> --}}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">削除確認</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+          </button>
+        </div>
+        <div class="modal-body">
+          <h5>削除しますか？</h5>
+          <div id="delete-text"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+          <button type="button" class="btn btn-danger" id="delete-btn" data-bs-dismiss="modal">削除する</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  {{-- <!-- EditModal -->
     <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
