@@ -2,6 +2,7 @@
 
 @section('content')
   <section class="shift">
+    <!-- カレンダーshift.jsの読み込み -->
     <div id='shift'></div>
   </section>
   <!-- CreateModal -->

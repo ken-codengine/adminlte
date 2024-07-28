@@ -3,11 +3,12 @@
 @section('title', 'Dashboard')
 
 @section('content_header')
-  <h1>Dashboard</h1>
+  <h1>管理画面</h1>
 @stop
 
 @section('content')
   <x-adminlte-card>
+    <!-- シフト提出期限を過ぎたら管理画面からカレンダーをロックしたい -->
     <!-- 年のプルダウン -->
     <p>カレンダーをロック</p>
     <label for="yearSelect">西暦</label>
@@ -26,103 +27,11 @@
       </div>
       <?php endfor; ?>
     </div>
+
+    <!-- fullcalendar.js読み込み -->
     <div id='calendar'></div>
-    <!-- CreateModal -->
-    <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">予定を登録</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                aria-hidden="true">&times;</span></button>
-          </div>
-          <form name="create_form">
-            <div class="modal-body">
-              <label for="create_date" class="col-label">登録予定日:</label>
-              <input type="date" class="form-control" id="create_date" name="date" value="" required>
-              <div class="col py-1 ml my-auto" id="create_session_time">
-                {{ Form::label('session_time', 'セッション時間') }}
-                {{ Form::select(
-                    'session_time',
-                    array_map(function ($times) {
-                        return $times['start_time'] . ' ~ ' . $times['end_time'];
-                    }, $session_times),
-                    null,
-                    ['id' => 'session_time', 'class' => 'form-control', 'required' => 'required'],
-                ) }}
-              </div>
-              @foreach ($users as $key => $val)
-                <div class="col-md-2 py-1 ml-4 my-auto" id="create_user">
-                  {{ Form::checkbox('user', $key, false, ['id' => 'user' . $key, 'class' => 'form-check-input', 'required' => 'required']) }}
-                  {{ Form::label($val->name, null, ['class' => 'form-check-label']) }}
-                </div>
-              @endforeach
-              <div class="col py-1 ml my-auto" id="create_text">
-                {{ Form::label('text', '備考欄') }}
-                {{ Form::textarea('text', old('text'), ['class' => 'form-control', 'rows' => '5', 'required' => 'required']) }}
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
-              <button type="button" class="btn btn-primary" id="store-btn" data-bs-dismiss="modal">保存する</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-    <!-- deleteModal -->
-    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">予定を編集</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                aria-hidden="true">&times;</span></button>
-          </div>
-          @method('patch')
-          <form method="POST" action="">
-            <div class="modal-body">
-              @csrf
-              <input type="hidden" id="edit_id" value="" name="id">
-              <label for="edit_date" class="col-label">登録予定日:</label>
-              <input type="date" class="form-control" id="edit_date" name="date" value="">
-              <label for="edit_text" class="col-form-label">連絡事項:</label>
-              <input type="text" class="form-control" id="edit_text" name="text" value="">
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
-              <button type="submit" class="btn btn-primary">保存する</button>
-              <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#exampleModal">
-                削除する</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-      aria-hidden="true">
-      <div class="modal-dialog modal-sm" style="margin: 150px auto;" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">削除確認</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">削除しますか？</div>
-          <div class="modal-footer">
-            @method('delete')
-            <form method="POST" action="">
-              @csrf
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">やめる</button>
-              <input type="hidden" id="delete_id" value="" name="id">
-              <button type="submit" class="btn btn-danger">はい</button>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- confirmModal -->
+
+    <!-- 提出されたシフト確認・削除用confirmModal -->
     <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -132,7 +41,6 @@
             </button>
           </div>
           <div class="modal-body">
-            {{-- <h5>提出されたシフト</h5> --}}
             <div id="confirm-text"></div>
           </div>
           <div class="modal-footer">
@@ -142,50 +50,24 @@
         </div>
       </div>
     </div>
-    {{-- <!-- showModal -->
-    <div class="modal fade" id="showModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">予定を編集</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                aria-hidden="true">&times;</span></button>
-          </div>
-          @method('patch')
-          <form method="POST" action="">
-            <div class="modal-body">
-              @csrf
-              <input type="hidden" id="show_id" value="" name="id">
-              <label for="show_date" class="col-label">登録予定日:</label>
-              <input type="date" class="form-control" id="show_date" name="date" value="">
-              <label for="show_text" class="col-form-label">連絡事項:</label>
-              <input type="text" class="form-control" id="show_text" name="text" value="">
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
-              <button type="submit" class="btn btn-primary">保存する</button>
-              <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#exampleModal">
-                削除する</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div> --}}
   </x-adminlte-card>
   @push('js')
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="/js/holiday_jp.js"></script>
     <script>
+      // チェックされた月をDBに保存していく関数
       for (var i = 1; i <= 12; i++) {
-        (function(i) { // 即時関数で i の値をキャプチャ
+        (function(i) { // DB保存用のmonthを即時関数で i の値をキャプチャ
           var checkbox = document.getElementById('monthCheckbox' + i);
+
+          // チェックが切り替わるたびにそのyearとmonthをDB(lock_month)に送信
           checkbox.addEventListener('change', function() {
+            // 10進数で年を取得
             var year = parseInt(document.getElementById('yearSelect').value, 10);
             var month = i;
-            // var month = i.toString().padStart(2, '0'); // 月を2桁の形式で取得
-            // var date = '01'
-            // var formattedDate = year + '-' + month + date; // 年-月-日の形式を作成
-            // console.log(formattedDate);
+
+            // ユーザー画面で表示中のカレンダーの年月（info.view.currentStart）と照合したい            
+            // axiosでデータ送信
             axios.post('/your-endpoint', {
                 checkboxState: this.checked,
                 year: year, // ここで作成した日付を送信

@@ -120,29 +120,28 @@ let calendar = new Calendar(calendarEl, {
 
   selectable: true,
   select: function (info) {
-    // // データベースから取得した年と月
-    // let dbYear = 2024;/* データベースから取得した年 */;
-    // let dbMonth = 6; /* データベースから取得した月 */;
+    // select時の月初めの値(info.view.currentStart)とDB(lock_month)群を比較
+    // 該当する場合はselect時にcautionModal(シフト変更不可)で擬似的にlock形式
 
-    // // info.startから年と月を取得
-    // let dateObj = new Date(info.startStr);
-    // let infoYear = dateObj.getFullYear();
-    // let infoMonth = dateObj.getMonth(); // 月は0から始まるため、比較時に注意
+    // 例)データベースから取得した年と月
+    let dbYear = 2024;
+    let dbMonth = 6;
 
-    let dbDate = "2024-06-01";
-    // UTCでの日付を作成
-    let dateUTC = new Date(`${dbDate}T00:00:00Z`);
-    // JST (GMT+0900) に変換するために、9時間分のミリ秒を加算
-    let timestampUTC = dateUTC.getTime() - (9 * 60 * 60 * 1000);
+    // info.view.currentStartに合わせてYYYY-MM-01に変換
+    var date = '01'
+    var formattedDate = dbYear + '-0' + dbMonth + '-' + date;
+
+    // JSTでの日付を作成
+    let dateJST = new Date(`${formattedDate}T00:00:00Z`);
+    // UTCに変換するために、9時間分のミリ秒を除算
+    let timestampUTC = dateJST.getTime() - (9 * 60 * 60 * 1000);
 
     // チェックボックスのDOM要素を取得します
     let checkboxes = document.querySelectorAll('.form-check-input');
     checkboxes.forEach(checkbox => checkbox.checked = false);
-    // document.getElementById('createModal_description').innerText = info.startStr;
     document.getElementById('create_date').value = info.startStr;
 
-    // 年と月が同時に一致しないか判定
-    // if (dbYear !== infoYear || dbMonth !== infoMonth + 1) {
+    // 年月が一致しないか判定
     if (timestampUTC === info.view.currentStart.valueOf()) {
       cautionModal.show();
       document.getElementById('caution-text').innerText = "";
@@ -197,60 +196,60 @@ let calendar = new Calendar(calendarEl, {
   },
 
   eventClick: function (info) {
-    // // データベースから取得した年と月
-    // let dbYear = 2024;/* データベースから取得した年 */;
-    // let dbMonth = 6; /* データベースから取得した月 */;
+    // // // データベースから取得した年と月
+    // // let dbYear = 2024;/* データベースから取得した年 */;
+    // // let dbMonth = 6; /* データベースから取得した月 */;
 
-    // // info.startから年と月を取得
-    // let dateObj = new Date(info.startStr);
-    // let infoYear = dateObj.getFullYear();
-    // let infoMonth = dateObj.getMonth(); // 月は0から始まるため、比較時に注意
+    // // // info.startから年と月を取得
+    // // let dateObj = new Date(info.startStr);
+    // // let infoYear = dateObj.getFullYear();
+    // // let infoMonth = dateObj.getMonth(); // 月は0から始まるため、比較時に注意
 
-    let dbDate = "2024-06-01";
-    // UTCでの日付を作成
-    let dateUTC = new Date(`${dbDate}T00:00:00Z`);
-    // JST (GMT+0900) に変換するために、9時間分のミリ秒を加算
-    let timestampUTC = dateUTC.getTime() - (9 * 60 * 60 * 1000);
+    // let dbDate = "2024-06-01";
+    // // UTCでの日付を作成
+    // let dateUTC = new Date(`${dbDate}T00:00:00Z`);
+    // // JST (GMT+0900) に変換するために、9時間分のミリ秒を加算
+    // let timestampUTC = dateUTC.getTime() - (9 * 60 * 60 * 1000);
 
-    // チェックボックスのDOM要素を取得します
-    let checkboxes = document.querySelectorAll('.form-check-input');
-    checkboxes.forEach(checkbox => checkbox.checked = false);
-    // document.getElementById('createModal_description').innerText = info.startStr;
-    document.getElementById('create_date').value = info.startStr;
+    // // チェックボックスのDOM要素を取得します
+    // let checkboxes = document.querySelectorAll('.form-check-input');
+    // checkboxes.forEach(checkbox => checkbox.checked = false);
+    // // document.getElementById('createModal_description').innerText = info.startStr;
+    // document.getElementById('create_date').value = info.startStr;
 
-    // 年と月が一致するか判定
-    // if (dbYear === infoYear && dbMonth === infoMonth + 1) { // データベースの月が1から始まる場合、+1を忘れずに
-    if (timestampUTC === info.view.currentStart.valueOf()) { // データベースの月が1から始まる場合、+1を忘れずに
-      cautionModal.show();
-      document.getElementById('caution-text').innerText = info.event.startStr + " " + info.event.title;
-    } else {
-      deleteModal.show();
-      document.getElementById('delete-text').innerText = info.event.startStr + " " + info.event.title;
-      const close = document.getElementById('delete-btn');
-      const deleteOnClick = () => {
-        axios
-          .post("/home/delete", {
-            id: info.event.id
-          })
-          .then((response) => {
-            var event = calendar.getEventById(response.data.id)
-            event.remove();
-            // //renderevent();はv3まで
-            // calendar.refetchEvents();
-          })
-          .catch(() => {
-            // バリデーションエラーなど
-            alert("取得に失敗しました");
-          });
-      };
+    // // 年と月が一致するか判定
+    // // if (dbYear === infoYear && dbMonth === infoMonth + 1) { // データベースの月が1から始まる場合、+1を忘れずに
+    // if (timestampUTC === info.view.currentStart.valueOf()) { // データベースの月が1から始まる場合、+1を忘れずに
+    //   cautionModal.show();
+    //   document.getElementById('caution-text').innerText = info.event.startStr + " " + info.event.title;
+    // } else {
+    //   deleteModal.show();
+    //   document.getElementById('delete-text').innerText = info.event.startStr + " " + info.event.title;
+    //   const close = document.getElementById('delete-btn');
+    //   const deleteOnClick = () => {
+    //     axios
+    //       .post("/home/delete", {
+    //         id: info.event.id
+    //       })
+    //       .then((response) => {
+    //         var event = calendar.getEventById(response.data.id)
+    //         event.remove();
+    //         // //renderevent();はv3まで
+    //         // calendar.refetchEvents();
+    //       })
+    //       .catch(() => {
+    //         // バリデーションエラーなど
+    //         alert("取得に失敗しました");
+    //       });
+    //   };
 
-      //保存ボタンによる送信、その後イベントの解除
-      close.addEventListener('click', deleteOnClick)
-      deleteModalEl.addEventListener('hidden.bs.modal', () => {
-        //第二引数に値を指定する必要がある
-        close.removeEventListener('click', deleteOnClick);
-      });
-    }
+    //   //保存ボタンによる送信、その後イベントの解除
+    //   close.addEventListener('click', deleteOnClick)
+    //   deleteModalEl.addEventListener('hidden.bs.modal', () => {
+    //     //第二引数に値を指定する必要がある
+    //     close.removeEventListener('click', deleteOnClick);
+    //   });
+    // }
 
   }
 });
