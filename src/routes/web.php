@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\UsersController;
+use App\Http\Controllers\LockMonthController;
 use App\Http\Controllers\ScheduleController;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
@@ -17,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('auth/login');
 });
 
 Route::get('/admin/login', function () {
@@ -63,10 +64,15 @@ Route::group([
     // $router->get('/home', [ScheduleController::class, 'index'])->name('admin.home');
     // $router->resource('home', ScheduleController::class, ['except' => ['']]);
     $router->get('/home', [ScheduleController::class, 'index'])->name('admin.home');
-    $router->post('/home/events', [ScheduleController::class, 'getEventsForPeriod']);
+    $router->post('/home/events', [ScheduleController::class, 'show'])->name('admin.home.events');
     $router->post('/home/store', [ScheduleController::class, 'store'])->name('admin.home.store');
+    $router->post('/home/destroy', [ScheduleController::class, 'destroy'])->name('admin.home.destroy');
 
     $router->resource('user', UsersController::class, ['except' => ['show']]);
+
+    $router->get('/home/lock_month', [LockMonthController::class, 'index'])->name('admin.home.lock_month');
+    $router->post('/home/lock_month/store', [LockMonthController::class, 'store'])->name('admin.home.lock_month.store');
+    $router->delete('/home/lock_month/delete', [LockMonthController::class, 'delete']);
 });
 
 Route::post(
@@ -76,4 +82,9 @@ Route::post(
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/home', [App\Http\Controllers\ShiftController::class, 'index'])->name('home');
+Route::post('/home/show', [App\Http\Controllers\ShiftController::class, 'show'])->name('home.show');
+Route::post('/home/store', [App\Http\Controllers\ShiftController::class, 'store'])->name('home.store');
+Route::post('/home/delete', [App\Http\Controllers\ShiftController::class, 'destroy'])->name('home.delete');
+
+Route::post('/home/lock_month/show', [App\Http\Controllers\LockMonthController::class, 'show'])->name('home.lock_month.show');
