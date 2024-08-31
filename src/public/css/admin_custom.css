@@ -15,3 +15,23 @@ a {
 .fc-day-hol {
     color: red;
 }
+
+.calendar-lock {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.calendar-lock div {
+    display: flex;
+    align-items: center;
+}
+
+.calendar-lock label {
+    margin: 0;
+}
+
+.calendar-lock input {
+    margin-right: 5px;
+}

@@ -28,7 +28,7 @@
       <?php endfor; ?>
     </div>
 
-    <!-- fullcalendar.js読み込み -->
+    <!-- adminLTEプラグインfullcalendar.js読み込み -->
     <div id='calendar'></div>
 
     <!-- 提出されたシフト確認・削除用confirmModal -->
@@ -55,33 +55,86 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="/js/holiday_jp.js"></script>
     <script>
-      // チェックされた月をDBに保存していく関数
-      for (var i = 1; i <= 12; i++) {
-        (function(i) { // DB保存用のmonthを即時関数で i の値をキャプチャ
-          var checkbox = document.getElementById('monthCheckbox' + i);
+      function updateCheckboxes(year) {
+        // すべてのチェックボックスをリセット
+        var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(function(checkbox) {
+          checkbox.checked = false;
+        });
 
-          // チェックが切り替わるたびにそのyearとmonthをDB(lock_month)に送信
-          checkbox.addEventListener('change', function() {
-            // 10進数で年を取得
-            var year = parseInt(document.getElementById('yearSelect').value, 10);
-            var month = i;
+        // 新しい年に基づいてチェックボックスを更新
+        axios.get('/admin/home/lock_month', {
+            params: {
+              year: year
+            }
+          })
+          .then(function(response) {
+            // レスポンスの処理
+            console.log(response.data.message); // 成功メッセージを表示
+            // console.log(response.data.data); // 保存されたデータを表示
+            // チェックボックスにチェックを入れる
+            response.data.data.forEach(function(month) {
+              document.getElementById('monthCheckbox' + month).checked = true;
+            });
+          })
+          .catch(function(error) {
+            // エラーの処理
+            console.error(error.response.data.message); // エラーメッセージを表示
+          });
+      }
 
-            // ユーザー画面で表示中のカレンダーの年月（info.view.currentStart）と照合したい            
-            // axiosでデータ送信
-            axios.post('/your-endpoint', {
-                checkboxState: this.checked,
+      document.getElementById('yearSelect').addEventListener('change', function() {
+        var year = this.value;
+        updateCheckboxes(year);
+      });
+
+      // ページ読み込み時にyearSelectの値を取得してチェックボックスを更新
+      document.addEventListener('DOMContentLoaded', function() {
+        var year = document.getElementById('yearSelect').value;
+        updateCheckboxes(year);
+      });
+
+      // チェックが切り替わるたびにそのyearとmonthをDB(lock_month)に送信
+      var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      checkboxes.forEach(function(checkbox, i) {
+        checkbox.addEventListener('change', function() {
+          var year = document.getElementById('yearSelect').value;
+          var month = (i + 1).toString(); // 月を文字列として取得
+
+          // axiosでデータ送信
+          if (this.checked) {
+            // チェックが入った場合はデータを保存
+            axios.post('/admin/home/lock_month/store', {
                 year: year, // ここで作成した日付を送信
                 month: month // ここで作成した日付を送信
               })
               .then(function(response) {
-                // console.log(response);
+                // レスポンスの処理
+                console.log(response.data.message); // 成功メッセージを表示
               })
               .catch(function(error) {
-                // console.log(error);
+                // エラーの処理
+                console.error(error.response.data.message); // エラーメッセージを表示
               });
-          });
-        })(i);
-      }
+          } else {
+            // チェックが外れた場合はデータを削除
+            axios.delete('/admin/home/lock_month/delete', {
+                data: {
+                  year: year,
+                  month: month
+                }
+              })
+              .then(function(response) {
+                // レスポンスの処理
+                console.log(response.data.message); // 成功メッセージを表示
+              })
+              .catch(function(error) {
+                // エラーの処理
+                console.error(error.response.data.message); // エラーメッセージを表示
+              });
+          }
+        });
+      });
 
       document.addEventListener('DOMContentLoaded', function() {
         // const editModal = new Modal(document.getElementById('editModal'));
