@@ -16,29 +16,22 @@ class ScheduleTableSeeder extends Seeder
     public function run(): void
     {
         //ここから追加
-        $texts = [
-            '半日希望',
-            '×(出勤不可)',
-            '×(出勤不可)',
-            // '早田：出勤可能',
+        $lists = [
+            '11:00 ひまわり 早田、田中、山田',
+            '14:00 星月夜 早田、田中',
+            '16:00 レモンのある静物 山田'
         ];
 
-        // DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         Schedule::truncate();
-        foreach ($texts as $text) {
-
+        foreach ($lists as $list) {
             Schedule::create([
                 'uuid' => (string)Str::uuid(),
-                'date' => '2023-12-11',
-                'text' => $text,
+                'date' => '2024-6-8',
+                'text' => $list,
+                'created_at' => '2022-12-30 11:22:33',
+                'updated_at' => '2022-12-31 23:58:59',
             ]);
         }
-        Schedule::create([
-            'uuid' => (string)Str::uuid(),
-            'date' => '2023-12-12',
-            'text' => '×(出勤不可)',
-        ]);
-        // DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         //ここまで追加
     }
 }
