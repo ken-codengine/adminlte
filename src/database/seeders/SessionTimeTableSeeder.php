@@ -14,11 +14,17 @@ class SessionTimeTableSeeder extends Seeder
     public function run(): void
     {
         //
+        $lists = [
+            '11:00' => '13:00',
+            '14:00' => '16:00',
+            '18:00' => '20:00'
+        ];
+
         SessionTime::truncate();
-        foreach (range(1, 2) as $num) {
+        foreach ($lists as $start_time => $end_time) {
             SessionTime::create([
-                'id' => $num,
-                'session_time' => '11:00~13:00',
+                'start_time' => $start_time,
+                'end_time' => $end_time
             ]);
         }
     }

@@ -15,7 +15,8 @@ return new class extends Migration
     {
         Schema::create('session_times', function (Blueprint $table) {
             $table->id();
-            $table->string('session_time');
+            $table->string('start_time');
+            $table->string('end_time');
             $table->timestamps();
         });
 

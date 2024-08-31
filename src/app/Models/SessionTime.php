@@ -11,10 +11,11 @@ class SessionTime extends Model
 
     public static function getSessionTimes()
     {
-        return self::select('session_time')
+        return self::select('start_time', 'end_time')
+            ->orderBy('start_time', 'asc')
             ->get()
             ->map(function ($session) {
-                return $session['session_time'];
+                return ['start_time' => $session['start_time'], 'end_time' => $session['end_time']];
             })
             ->all();
     }
