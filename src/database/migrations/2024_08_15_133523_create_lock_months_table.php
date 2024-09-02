@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('lock_months', function (Blueprint $table) {
             $table->id();
-            $table->string('year');
-            $table->string('month');
+            $table->string('year'); //年
+            $table->string('month'); //月
             $table->timestamps();
         });
     }

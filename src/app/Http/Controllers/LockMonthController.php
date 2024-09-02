@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreLockMonthRequest;
-use App\Http\Requests\UpdateLockMonthRequest;
 use App\Models\LockMonth;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Http\Request;
@@ -13,6 +11,7 @@ class LockMonthController extends Controller
     /**
      * Display a listing of the resource.
      */
+    //管理側からロックされた月を取得後チェックボックスに反映するindex()
     public function index()
     {
         // DBからデータを取得
@@ -44,6 +43,7 @@ class LockMonthController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+    //　管理側からロック月を追加するstore()
     public function store(Request $request)
     {
         // バリデーション
@@ -58,7 +58,6 @@ class LockMonthController extends Controller
         $lockMonth->month = $request->input('month');
         $lockMonth->save();
 
-        // return redirect()->route('admin.home');
         // レスポンスの作成
         return Response::json([
             'status' => 'success',
@@ -70,6 +69,7 @@ class LockMonthController extends Controller
     /**
      * Display the specified resource.
      */
+    // ユーザー側からのtitle(2024年⚪︎月)で照合後booleanを返すshow()
     public function show(Request $request, LockMonth $lockMonths)
     {
         // バリデーション
@@ -80,10 +80,10 @@ class LockMonthController extends Controller
         // リクエストからタイトルを取得
         $title = $request->title;
 
-        // ロック月を取得
+        // Model内のgetLockMonths()関数でtitleに合わせた形でロック月を取得
         $lockMonths = LockMonth::getLockMonths();
 
-        // タイトルがロック月に含まれているか確認
+        // titleがロック月に含まれているか確認
         $titleExists = in_array($title, $lockMonths);
 
         return Response::json([
@@ -105,7 +105,7 @@ class LockMonthController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateLockMonthRequest $request, LockMonth $lockMonth)
+    public function update(Request $request, LockMonth $lockMonth)
     {
         //
     }
@@ -113,6 +113,7 @@ class LockMonthController extends Controller
     /**
      * Remove the specified resource from storage.
      */
+    // 管理側からロック月を削除するdelete()
     public function delete(Request $request)
     {
         // バリデーション
