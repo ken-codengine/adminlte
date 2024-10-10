@@ -8,7 +8,7 @@
 
 @section('content')
   <x-adminlte-card>
-    <!-- シフト提出期限を過ぎたら管理画面からカレンダーをロックしたい -->
+    <!-- シフト提出期限を過ぎたら管理画面からカレンダーをロック -->
     <!-- 年のプルダウン -->
     <p>カレンダーをロック</p>
     <label for="yearSelect">西暦</label>
@@ -55,6 +55,7 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="/js/holiday_jp.js"></script>
     <script>
+      // DBからLockMonthを取得してチェックボックスに反映する関数
       function updateCheckboxes(year) {
         // すべてのチェックボックスをリセット
         var checkboxes = document.querySelectorAll('input[type="checkbox"]');
@@ -62,7 +63,7 @@
           checkbox.checked = false;
         });
 
-        // 新しい年に基づいてチェックボックスを更新
+        // 選択されているプルダウン(年)を送信してDBと照合
         axios.get('/admin/home/lock_month', {
             params: {
               year: year
@@ -71,8 +72,7 @@
           .then(function(response) {
             // レスポンスの処理
             console.log(response.data.message); // 成功メッセージを表示
-            // console.log(response.data.data); // 保存されたデータを表示
-            // チェックボックスにチェックを入れる
+            // 送信した年に該当するmonthを受け取りボックスにチェックを入れる
             response.data.data.forEach(function(month) {
               document.getElementById('monthCheckbox' + month).checked = true;
             });
@@ -83,30 +83,32 @@
           });
       }
 
-      document.getElementById('yearSelect').addEventListener('change', function() {
-        var year = this.value;
-        updateCheckboxes(year);
-      });
-
       // ページ読み込み時にyearSelectの値を取得してチェックボックスを更新
       document.addEventListener('DOMContentLoaded', function() {
         var year = document.getElementById('yearSelect').value;
         updateCheckboxes(year);
       });
+      // プルダウン(年)の値が変更されたらチェックボックス(月)を更新
+      document.getElementById('yearSelect').addEventListener('change', function() {
+        var year = this.value;
+        updateCheckboxes(year);
+      });
+
 
       // チェックが切り替わるたびにそのyearとmonthをDB(lock_month)に送信
       var checkboxes = document.querySelectorAll('input[type="checkbox"]');
       checkboxes.forEach(function(checkbox, i) {
         checkbox.addEventListener('change', function() {
+          //プルダウン(年)を取得し直す
           var year = document.getElementById('yearSelect').value;
           var month = (i + 1).toString(); // 月を文字列として取得
 
-          // axiosでデータ送信
+          // チェックの有無で保存・削除のデータ送信を行う
           if (this.checked) {
             // チェックが入った場合はデータを保存
             axios.post('/admin/home/lock_month/store', {
-                year: year, // ここで作成した日付を送信
-                month: month // ここで作成した日付を送信
+                year: year, // 年を送信
+                month: month // 月を送信
               })
               .then(function(response) {
                 // レスポンスの処理
@@ -194,8 +196,6 @@
                 calendar.removeAllEvents();
                 // // カレンダーに読み込み
                 successCallback(response.data);
-                // console.log(response.data);
-                // console.log(info);
               })
               .catch(() => {
                 // バリデーションエラーなど
