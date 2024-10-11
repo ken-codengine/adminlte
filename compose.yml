@@ -73,6 +73,8 @@ services:
       - MYSQL_USER=${DB_USERNAME:-phper}
       - MYSQL_PASSWORD=${DB_PASSWORD:-secret}
       - MYSQL_ROOT_PASSWORD=${DB_PASSWORD:-secret}
+    # commandを追記 or commandに追記
+    command: mysqld --innodb_use_native_aio=0
 
   mailpit:
     image: axllent/mailpit
