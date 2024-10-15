@@ -1,11 +1,11 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\LockMonthController;
 use App\Http\Controllers\ScheduleController;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-// 管理者ログイン関連
+
 Route::get('/', function () {
     return view('auth/login');
 });
@@ -81,13 +81,36 @@ Route::group([
 });
 
 // カレンダーロック機能のルーティング（ユーザー画面側呼び出し）
-Route::post('/home/lock_month/show', [App\Http\Controllers\LockMonthController::class, 'show'])->name('home.lock_month.show');
+Route::post('/dashboard/lock_month/show', [App\Http\Controllers\LockMonthController::class, 'show'])->name('dashboard.lock_month.show');
 
-//Laravel/uiデフォルトのログイン機能を使用
-Auth::routes();
+// //Laravel/uiデフォルトのログイン機能を使用
+// Auth::routes();
 
-//ユーザ画面ではShiftControllerで自分のshiftだけを表示する
-Route::get('/home', [App\Http\Controllers\ShiftController::class, 'index'])->name('home');
-Route::post('/home/show', [App\Http\Controllers\ShiftController::class, 'show'])->name('home.show');
-Route::post('/home/store', [App\Http\Controllers\ShiftController::class, 'store'])->name('home.store');
-Route::post('/home/delete', [App\Http\Controllers\ShiftController::class, 'destroy'])->name('home.delete');
+// //ユーザ画面ではShiftControllerで自分のshiftだけを表示する
+// Route::get('/dashboard', [App\Http\Controllers\ShiftController::class, 'index'])->name('dashboard');
+// Route::post('/dashboard/show', [App\Http\Controllers\ShiftController::class, 'show'])->name('dashboard.show');
+// Route::post('/dashboard/store', [App\Http\Controllers\ShiftController::class, 'store'])->name('dashboard.store');
+// Route::post('/dashboard/delete', [App\Http\Controllers\ShiftController::class, 'destroy'])->name('dashboard.delete');
+
+// breezeのログイン機能を使用
+Route::get('/', function () {
+    return view('welcome');
+});
+
+// Route::get('/dashboard', function () {
+//     return view('dashboard');
+// })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', [App\Http\Controllers\ShiftController::class, 'index'])->name('dashboard');
+    Route::post('/dashboard/show', [App\Http\Controllers\ShiftController::class, 'show'])->name('dashboard.show');
+    Route::post('/dashboard/store', [App\Http\Controllers\ShiftController::class, 'store'])->name('dashboard.store');
+    Route::post('/dashboard/delete', [App\Http\Controllers\ShiftController::class, 'destroy'])->name('dashboard.delete');
+});
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+require __DIR__ . '/auth.php';
