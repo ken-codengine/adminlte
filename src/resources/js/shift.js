@@ -10,15 +10,51 @@ var createModalEl = document.getElementById('createModal')
 var deleteModalEl = document.getElementById('deleteModal')
 var confirmModalEl = document.getElementById('confirmModal')
 var cautionModalEl = document.getElementById('cautionModal')
-var createModal = new Modal(createModalEl, {});
-var deleteModal = new Modal(deleteModalEl, {});
-var confirmModal = new Modal(confirmModalEl, {});
-var cautionModal = new Modal(cautionModalEl, {});
+// var createModal = new Modal(createModalEl, {});
+// var deleteModal = new Modal(deleteModalEl, {});
+// var confirmModal = new Modal(confirmModalEl, {});
+// var cautionModal = new Modal(cautionModalEl, {});
 // document.addEventListener('DOMContentLoaded', function () {
 //   createModal.show();
 // var editModal = new Modal(editModalEl,{});
 // });
 var calendarEl = document.getElementById('shift');
+
+// モーダルを表示する関数
+function showModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.classList.add('opacity-0'); // 初期状態を透明に設定
+    setTimeout(() => {
+      modal.classList.remove('opacity-0');
+      modal.classList.add('opacity-100'); // 透明度を100%に設定
+    }, 10); // 少し遅延させてアニメーションをトリガー
+
+    // 背景を固定
+    document.body.style.overflow = 'hidden';
+  }
+}
+// モーダルを非表示にする関数
+function hideModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.classList.remove('opacity-100');
+    modal.classList.add('opacity-0'); // 透明度を0%に設定
+    setTimeout(() => {
+      modal.classList.add('hidden');
+      modal.classList.remove('opacity-0'); // 初期状態に戻す
+    }, 1000); // アニメーションの時間に合わせて遅延させる
+  }
+}
+
+const modalButtons = document.querySelectorAll('[data-modal-dismiss]');
+modalButtons.forEach(button => {
+  button.addEventListener('click', function () {
+    const modalId = this.getAttribute('data-modal-dismiss');
+    hideModal(modalId);
+  });
+});
 
 let calendar = new Calendar(calendarEl, {
   //表示テーマ
@@ -104,7 +140,7 @@ let calendar = new Calendar(calendarEl, {
 
     // 表示中カレンダーの月初と終わりの範囲にあるイベントを取得
     axios
-      .post("/home/show", {
+      .post("/dashboard/show", {
         start_date: info.start.valueOf(),
         end_date: info.end.valueOf(),
       })
@@ -148,10 +184,11 @@ let calendar = new Calendar(calendarEl, {
 
     return false; // それ以外は選択不可
   },
+
   select: function (info) {
     // 表示中のカレンダー月がロックされているか判定し登録or警告モーダル表示
     axios
-      .post("/home/lock_month/show", {
+      .post("/dashboard/lock_month/show", {
         //fulucalenderのinfo.view.titleは表示中の月(2024年⚪︎月)
         title: info.view.title
       })
@@ -170,12 +207,13 @@ let calendar = new Calendar(calendarEl, {
           // モーダルの日付をクリックした日に設定にしておく
           document.getElementById('create_date').value = info.startStr;
           // 新規登録モーダルを表示する
-          createModal.show();
+          // createModal.show();
+          showModal('createModal');
 
           // 保存ボタンによる送信を行う関数
           const saveOnClick = async () => {
             // 保存前にロックされた月を取得して判定
-            const response = await axios.post("/home/lock_month/show", {
+            const response = await axios.post("/dashboard/lock_month/show", {
               // info.view.titleで表示中の月(2024年⚪︎月)を送信
               title: info.view.title
             });
@@ -198,7 +236,7 @@ let calendar = new Calendar(calendarEl, {
               let checkboxStates = Array.from(checkboxes).map(checkbox => checkbox.checked ? '⚪︎' : '×').join('/');
               // Laravelのaxiosから登録処理の呼び出し
               axios
-                .post("/home/store", {
+                .post("/dashboard/store", {
                   // start_date: info.start.valueOf(),
                   // end_date: info.end.valueOf(),
                   date: date,
@@ -227,10 +265,11 @@ let calendar = new Calendar(calendarEl, {
           //保存ボタンによる送信、その後イベントの解除
           const close = document.getElementById('store-btn');
           close.addEventListener('click', saveOnClick)
-          createModalEl.addEventListener('hidden.bs.modal', () => {
-            //第二引数に値を指定する必要がある
-            close.removeEventListener('click', saveOnClick);
-          });
+          createModalEl.addEventListener('transitionend', () => {
+            if (createModalEl.classList.contains('hidden')) {
+              close.removeEventListener('click', saveOnClick);
+            }
+          }, { once: true });
         }
       });
   },
@@ -239,7 +278,7 @@ let calendar = new Calendar(calendarEl, {
   eventClick: function (info) {
     // イベントクリック時の月初めの値(info.view.currentStart)とDB(lock_month)群を比較
     axios // lock_month取得処理の呼び出し
-      .post("/home/lock_month/show", {
+      .post("/dashboard/lock_month/show", {
         title: info.view.title
       })
       .then((response) => {
@@ -261,7 +300,7 @@ let calendar = new Calendar(calendarEl, {
 
           const deleteOnClick = async () => {
             // 再度titleExistsを取得して判定
-            const response = await axios.post("/home/lock_month/show", {
+            const response = await axios.post("/dashboard/lock_month/show", {
               title: info.view.title
             });
             var titleExists = response.data.titleExists;
@@ -271,7 +310,7 @@ let calendar = new Calendar(calendarEl, {
               document.getElementById('caution-text').innerText = info.event.startStr + " " + info.event.title;
             } else {
               axios
-                .post("/home/delete", {
+                .post("/dashboard/delete", {
                   id: info.event.id
                 })
                 .then((response) => {
