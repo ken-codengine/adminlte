@@ -22,7 +22,7 @@ class ShiftController extends Controller
 		//
 		$session_times = SessionTime::getSessionTimes();
 		$data = ['session_times' => $session_times];
-		return view('home', $data);
+		return view('dashboard', $data);
 	}
 
 	/**
@@ -68,7 +68,7 @@ class ShiftController extends Controller
 		$shift->name = $user->name;
 		$shift->color = $user->color;
 
-		$data = fn ($shift) => $this->convertToEventByShiftForFullcalendar($shift);
+		$data = fn($shift) => $this->convertToEventByShiftForFullcalendar($shift);
 
 		return $data($shift);  // 無名関数を実行します
 	}
@@ -98,7 +98,7 @@ class ShiftController extends Controller
 			->whereBetween('date', [$start_date, $end_date])
 			// ->where('user_id', $id)
 			->get()
-			->map(fn ($schedule) => $this->convertToEventByScheduleForFullcalendar($schedule))
+			->map(fn($schedule) => $this->convertToEventByScheduleForFullcalendar($schedule))
 			->toArray();
 
 		$id = Auth::id();
@@ -115,7 +115,7 @@ class ShiftController extends Controller
 			->whereBetween('date', [$start_date, $end_date])
 			->where('user_id', $id)
 			->get()
-			->map(fn ($shift) => $this->convertToEventByShiftForFullcalendar($shift))
+			->map(fn($shift) => $this->convertToEventByShiftForFullcalendar($shift))
 			->toArray();
 
 		$data = array_merge($shifts, $schedules);
